@@ -1,4 +1,4 @@
-*.csv
+config/
 log.txt
 main
 .directory

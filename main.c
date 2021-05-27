@@ -16,6 +16,9 @@
 //
 //********************************************************************
 
+//define constants
+#define MAXLENGTH 50
+
 //define struct
 typedef struct
 {
@@ -23,10 +26,11 @@ typedef struct
     char name[32];
     int grade;
 }
-student;
+STUDENT;
 
 //declare variables
 FILE *file;
+STUDENT *database;
 
 //declare functions
 void create();
@@ -36,7 +40,7 @@ void avg();
 int main()
 {
     //declare variables
-    char *input = malloc(255);
+    char *input = malloc(MAXLENGTH);
     bool isError = false;
 
     do
@@ -71,7 +75,49 @@ int main()
 
 void create()
 {
-    file = fopen("../config/config.nscf", "w");
+
+    file = fopen("../config/config.nscf", "wb+");
+    int count = 1;
+    char* name = malloc(MAXLENGTH);
+    char *lastName = malloc(MAXLENGTH);
+    int grade;
+    bool isRunning = true;
+
+    printf("* Start adding students to the database\n* Type in \"END\" if you are finished\n");
+    do
+    {
+        fflush(stdin);
+        printf("* ---- Student %d ----\n", count);
+        printf("./ADD/%d/LAST-NAME/", count);
+        gets(lastName);
+
+        if(strcmp(lastName, "END") == 0)
+        {
+            printf("* [BREAK]\n");
+            isRunning = false;
+        }
+
+        printf("./ADD/%d/FIRST-NAME/", count);
+        gets(name);
+
+        printf("./ADD/%d/GRADE/", count);
+        scanf("%d", &grade);
+
+        strcat(lastName, " ");
+        strcat(lastName, name);
+
+        /*
+        database[count - 1].id_number = count;
+        strncpy(database[count - 1].name, lastName, 2*MAXLENGTH);
+        database[count - 1].grade = grade;
+         */
+        printf("[OK] Added student %s\n", lastName);
+        ++count;
+    }
+    while (isRunning);
+
+    //fwrite(database, sizeof (STUDENT), count - 1, file);
+    fclose(file);
 }
 
 void info()
