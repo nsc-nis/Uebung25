@@ -30,7 +30,7 @@ STUDENT;
 
 //declare variables
 FILE *file;
-STUDENT *database;
+STUDENT database[512];
 
 //declare functions
 void create();
@@ -77,52 +77,67 @@ void create()
 {
 
     file = fopen("../config/config.nscf", "wb+");
-    int count = 1;
-    char* name = malloc(MAXLENGTH);
-    char *lastName = malloc(MAXLENGTH);
+    int count = 0;
+    char name[MAXLENGTH];
     int grade;
     bool isRunning = true;
 
-    printf("* Start adding students to the database\n* Type in \"END\" if you are finished\n");
+    printf("* Start adding students to the database\n* Type in \"EXIT\" if you are finished\n");
     do
     {
+        printf("* ---- Student %d ----\n", count+1);
+        printf("./ADD/%d/NAME/", count+1);
         fflush(stdin);
-        printf("* ---- Student %d ----\n", count);
-        printf("./ADD/%d/LAST-NAME/", count);
-        gets(lastName);
+        //gets(name);
+        scanf("%s", name);
 
-        if(strcmp(lastName, "END") == 0)
+        if(strcmp(name, "EXIT") == 0)
         {
             printf("* [BREAK]\n");
             isRunning = false;
         }
+        else
+        {
+            printf("./ADD/%d/GRADE/", count+1);
+            fflush(stdin);
+            scanf("%d", &grade);
 
-        printf("./ADD/%d/FIRST-NAME/", count);
-        gets(name);
+            database[count].id_number = count + 1;
+            strncpy(database[count].name, name, MAXLENGTH);
+            database[count].grade = grade;
 
-        printf("./ADD/%d/GRADE/", count);
-        scanf("%d", &grade);
-
-        strcat(lastName, " ");
-        strcat(lastName, name);
-
-        /*
-        database[count - 1].id_number = count;
-        strncpy(database[count - 1].name, lastName, 2*MAXLENGTH);
-        database[count - 1].grade = grade;
-         */
-        printf("[OK] Added student %s\n", lastName);
+            printf("[OK] Added student %s\n", name);
+        }
         ++count;
     }
     while (isRunning);
 
-    //fwrite(database, sizeof (STUDENT), count - 1, file);
+    fwrite(database, sizeof (STUDENT), count - 1, file);
     fclose(file);
 }
 
 void info()
 {
+    file = fopen("../config/config.nscf", "rb+");
+    int input = 0;
+    char cache;
+    STUDENT student[1];
 
+    printf("* Please type in the catalog number of the student you are searching for\n");
+    printf("./INFO/");
+    scanf("%d", &input);
+
+    fseek(file, input, 0);
+    fread(student, sizeof (STUDENT), 1, file);
+
+    printf("* Found student: \n");
+    printf("* - Catalog Number: %d\n", student[0].id_number);
+    printf("* - Name: %s\n", student[0].name);
+    printf("* - Grade: %d\n", student[0].grade);
+    printf("* Type in any key to continue...\n");
+    scanf("%c", &cache);
+
+    fclose(file);
 }
 
 void avg()
