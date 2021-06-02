@@ -113,7 +113,7 @@ void create()
             scanf("%d", &grade);
 
             database[count].id_number = count + 1;
-            strncpy(database[count].name, familyName, 2*MAXLENGTH+1);
+            strcpy(database[count].name, familyName);
             database[count].grade = grade;
 
             printf("[OK] Added student %s\n", database[count].name);
@@ -149,7 +149,7 @@ void info()
         printf("* - Name: %s\n", student.name);
         printf("* - Grade: %d\n", student.grade);
     }
-    
+
     fclose(file);
 }
 
