@@ -17,13 +17,13 @@
 //********************************************************************
 
 //define constants
-#define MAXLENGTH 50
+#define MAXLENGTH 100
 
 //define struct
 typedef struct
 {
     int id_number;
-    char name[32];
+    char name[MAXLENGTH];
     int grade;
 }
 STUDENT;
@@ -67,7 +67,7 @@ int main()
             isError = true;
         }
     }
-    while (isError);
+    while (isError );
 
 
     return 0;
@@ -76,9 +76,11 @@ int main()
 void create()
 {
 
-    file = fopen("../config/config.nscf", "wb+");
+    file = fopen("../config/config.nscf", "wb");
     int count = 0;
-    char name[MAXLENGTH];
+    //char firstName[MAXLENGTH];
+    char* firstName = malloc(MAXLENGTH);
+    char* familyName = malloc(2*MAXLENGTH+1);
     int grade;
     bool isRunning = true;
 
@@ -86,27 +88,35 @@ void create()
     do
     {
         printf("* ---- Student %d ----\n", count+1);
-        printf("./ADD/%d/NAME/", count+1);
+        printf("./ADD/%d/FIRST-NAME/", count+1);
         fflush(stdin);
-        //gets(name);
-        scanf("%s", name);
+        //gets(firstName);
+        scanf("%s", firstName);
 
-        if(strcmp(name, "EXIT") == 0)
+        if(strcmp(firstName, "EXIT") == 0)
         {
             printf("* [BREAK]\n");
             isRunning = false;
         }
         else
         {
+            printf("./ADD/%d/FAMILY-NAME/", count+1);
+            fflush(stdin);
+            //gets(firstName);
+            scanf("%s", familyName);
+
+            strcat(familyName, " ");
+            strcat(familyName, firstName);
+
             printf("./ADD/%d/GRADE/", count+1);
             fflush(stdin);
             scanf("%d", &grade);
 
             database[count].id_number = count + 1;
-            strncpy(database[count].name, name, MAXLENGTH);
+            strncpy(database[count].name, familyName, 2*MAXLENGTH+1);
             database[count].grade = grade;
 
-            printf("[OK] Added student %s\n", name);
+            printf("[OK] Added student %s\n", database[count].name);
         }
         ++count;
     }
@@ -118,24 +128,22 @@ void create()
 
 void info()
 {
-    file = fopen("../config/config.nscf", "rb+");
+    file = fopen("../config/config.nscf", "rb");
     int input = 0;
-    char cache;
-    STUDENT student[1];
+    STUDENT student;
 
     printf("* Please type in the catalog number of the student you are searching for\n");
     printf("./INFO/");
     scanf("%d", &input);
+    printf("Searching for %d...\n", input);
 
-    fseek(file, input, 0);
-    fread(student, sizeof (STUDENT), 1, file);
+    fseek(file, (input-1)*sizeof (STUDENT), 0);
+    fread(&student, sizeof (STUDENT), 1, file);
 
-    printf("* Found student: \n");
-    printf("* - Catalog Number: %d\n", student[0].id_number);
-    printf("* - Name: %s\n", student[0].name);
-    printf("* - Grade: %d\n", student[0].grade);
-    printf("* Type in any key to continue...\n");
-    scanf("%c", &cache);
+    printf("* [OK] Found student: \n");
+    printf("* - Catalog Number: %d\n", student.id_number);
+    printf("* - Name: %s\n", student.name);
+    printf("* - Grade: %d\n", student.grade);
 
     fclose(file);
 }
