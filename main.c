@@ -132,19 +132,24 @@ void info()
     int input = 0;
     STUDENT student;
 
-    printf("* Please type in the catalog number of the student you are searching for\n");
-    printf("./INFO/");
-    scanf("%d", &input);
-    printf("Searching for %d...\n", input);
+    if(file == NULL)
+        printf("* [ERROR] Could not open config file\n");
+    else
+    {
+        printf("* Please type in the catalog number of the student you are searching for\n");
+        printf("./INFO/");
+        scanf("%d", &input);
+        printf("Searching for %d...\n", input);
 
-    fseek(file, (input-1)*sizeof (STUDENT), 0);
-    fread(&student, sizeof (STUDENT), 1, file);
+        fseek(file, (input-1)*sizeof (STUDENT), 0);
+        fread(&student, sizeof (STUDENT), 1, file);
 
-    printf("* [OK] Found student: \n");
-    printf("* - Catalog Number: %d\n", student.id_number);
-    printf("* - Name: %s\n", student.name);
-    printf("* - Grade: %d\n", student.grade);
-
+        printf("* [OK] Found student: \n");
+        printf("* - Catalog Number: %d\n", student.id_number);
+        printf("* - Name: %s\n", student.name);
+        printf("* - Grade: %d\n", student.grade);
+    }
+    
     fclose(file);
 }
 
