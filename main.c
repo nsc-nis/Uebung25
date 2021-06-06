@@ -30,7 +30,6 @@ STUDENT;
 
 //declare variables
 FILE *file;
-STUDENT database[512];
 
 //declare functions
 void create();
@@ -41,7 +40,7 @@ int main()
 {
     //declare variables
     char *input = malloc(MAXLENGTH);
-    bool isError = false;
+    bool isError = true;
 
     do
     {
@@ -52,8 +51,11 @@ int main()
         printf("* Create new student database [CREATE]\n");
         printf("* Get Information about a student [INFO]\n");
         printf("* Calculate the average grade of all students [AVG]\n");
+        printf("* Exit the program [EXIT]\n");
         printf("./MENU/");
-        gets(input);
+        fflush(stdin);
+        scanf("%s", input);
+        //gets(input);
 
         if (strcmp(input, "CREATE") == 0)
             create();
@@ -61,11 +63,13 @@ int main()
             info();
         else if (strcmp(input, "AVG") == 0) //strcasecmp für case-insensitive comparison nur in UNIX-Systemen verfügbar
             avg();
-        else
+        else if(strcmp(input, "EXIT") == 0)
         {
-            printf("* [ERROR] Wrong input\n");
-            isError = true;
+            isError = false;
+            printf("* [OK] Exitting program\n");
         }
+        else
+            printf("* [ERROR] Unknown command\n");
     }
     while (isError );
 
@@ -75,6 +79,8 @@ int main()
 
 void create()
 {
+    char cache;
+    STUDENT database[512];
 
     file = fopen("../config/config.nscf", "wb");
     int count = 0;
@@ -124,10 +130,15 @@ void create()
 
     fwrite(database, sizeof (STUDENT), count - 1, file);
     fclose(file);
+    printf("* [OK] Changes saved\n");
+    printf("* Press any key to continue\n");
+    fflush(stdin);
+    scanf("%c", &cache);
 }
 
 void info()
 {
+    char cache;
     file = fopen("../config/config.nscf", "rb");
     int input = 0;
     STUDENT student;
@@ -136,6 +147,7 @@ void info()
         printf("* [ERROR] Could not open config file\n");
     else
     {
+        printf("* [OK] Read students from file\n");
         printf("* Please type in the catalog number of the student you are searching for\n");
         printf("./INFO/");
         scanf("%d", &input);
@@ -150,10 +162,42 @@ void info()
         printf("* - Grade: %d\n", student.grade);
     }
 
+    printf("* Press any key to continue\n");
+    fflush(stdin);
+    scanf("%c", &cache);
     fclose(file);
 }
 
 void avg()
 {
+    char cache;
+    file = fopen("../config/config.nscf", "rb");
+    STUDENT students[512];
+    int amount = 0;
+    float avg;
+    float sum;
 
+    if(file == NULL)
+        printf("* [ERROR] Could not open config file\n");
+    else
+    {
+        while ((fread(&students[amount], sizeof (STUDENT), 1, file)) != 0)
+        {
+            amount++;
+        }
+        printf("* [OK] Read students from file\n");
+
+        for(int i = 0; i < amount; i++)
+        {
+            sum = sum + (float) students[i].grade;
+        }
+        avg = sum / (float)amount;
+        printf("* [OK] Calculated average\n");
+
+        printf("* Average grade of all students: %f\n", avg);
+    }
+
+    printf("* Press any key to continue\n");
+    fflush(stdin);
+    scanf("%c", &cache);
 }
